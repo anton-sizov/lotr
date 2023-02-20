@@ -28,8 +28,9 @@ jobs:
           VUE_APP_API_URL: ${{ secrets.VUE_APP_API_URL }}
 
       - name: deploy files
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: dist
           clean: true
