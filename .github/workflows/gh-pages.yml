@@ -1,14 +1,36 @@
-name: Build Vue
+name: Deploy to github pages
+
+on:
+  push:
+    branches:
+      - master
 on: [push]
+
 jobs:
-  build_vue:
+  build-and-deploy:
+    environment: github-pages
     runs-on: ubuntu-latest
-    name: Build Vue
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     steps:
-    - uses: actions/checkout@v2
-    - id: Build-Vue
-      uses: xRealNeon/VuePagesAction@1.0.1
-      with:
-        username: 'anton-sizov'
-        reponame: 'lotr'
-        token: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run build --if-present
+        env:
+          VUE_APP_API_TOKEN: ${{ secrets.VUE_APP_API_TOKEN }}
+          VUE_APP_API_URL: ${{ secrets.VUE_APP_API_URL }}
+
+      - name: deploy files
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: dist
+          clean: true
